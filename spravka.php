@@ -2,9 +2,9 @@
 /**
 
 *
-* Do not edit or add to this file if you wish to upgrade Samuil Genov to newer
-* versions in the future. If you wish to customize Samuil Genov for your
-* needs please refer to http://www.Samuil Genov.com for more information.
+* Do not edit or add to this file if you wish to upgrade to newer
+* versions in the future. If you wish to customize for your
+* needs please refer to https://github.com/sadigester/spravka for more information.
 *
 *  @author    Samuil Genov <sadigester@gmail.com>
 *  @copyright Samuil Genov 
@@ -35,67 +35,102 @@ class spravka extends ModuleGrid
 
         parent::__construct();
 
-        $this->default_sort_column = 'totalPriceSold';
-        $this->default_sort_direction = 'DESC';
+        $this->default_sort_column = 'id_order';
+        $this->default_sort_direction = 'ASC';
         $this->empty_message = $this->trans('An empty record-set was returned.', array(), 'Modules.Statsbestproducts.Admin');
         $this->paging_message = $this->trans('Displaying %1$s of %2$s', array('{0} - {1}', '{2}'), 'Admin.Global');
 
         $this->columns = array(
             array(
-                'id' => 'id_product',
-                'header' => $this->l('Ид'),
-                'dataIndex' => 'id_product',
-                'align' => 'center'
+                'id' => 'id_order',
+                'header' => $this->trans('id_order', array(), 'Admin.Global'),
+                'dataIndex' => 'id_order',
+                'align' => 'right'
             ),
+            /*
             array(
                 'id' => 'reference',
                 'header' => $this->trans('Reference', array(), 'Admin.Global'),
                 'dataIndex' => 'reference',
                 'align' => 'left'
             ),
+            */
             array(
-                'id' => 'name',
-                'header' => $this->trans('Name', array(), 'Admin.Global'),
-                'dataIndex' => 'name',
+                'id' => 'invoice_date',
+                'header' => $this->l('Дата'),
+                'dataIndex' => 'invoice_date',
                 'align' => 'left'
             ),
             array(
-                'id' => 'basicPrice',
-                'header' => $this->l('Покупна цена'),
-                'dataIndex' => 'basicPrice',
-                'align' => 'center'
+                'id' => 'product_id',
+                'header' => $this->trans('product_id', array(), 'Admin.Global'),
+                'dataIndex' => 'product_id',
+                'align' => 'right'
+            ),            
+			array(
+                'id' => 'product_reference',
+                'header' => $this->l('Референция'),
+                'dataIndex' => 'product_reference',
+                'align' => 'left'
+            ),
+			array(
+                'id' => 'product_name',
+                'header' => $this->trans('Артикул', array(), 'Admin.Global'),
+                'dataIndex' => 'product_name',
+                'align' => 'left'
             ),
             array(
-                'id' => 'priceSold',
-                'header' => $this->l('Прод. цена'),
-                'dataIndex' => 'priceSold',
-                'align' => 'center'
+                'id' => 'reduction_name',
+                'header' => $this->l('Отстъпка'),
+                'dataIndex' => 'reduction_name',
+                'align' => 'left'
             ),
             array(
-                'id' => 'totalQuantitySold',
-                'header' => $this->l('Продадено'),
-                'dataIndex' => 'totalQuantitySold',
-                'align' => 'center'
+                'id' => 'reduction_percent',
+                'header' => $this->l('%'),
+                'dataIndex' => 'reduction_percent',
+                'align' => 'right'
+            ),
+			array(
+                'id' => 'product_quantity',
+                'header' => $this->l('Кол.'),
+                'dataIndex' => 'product_quantity',
+                'align' => 'right'
+            ),			
+            array(
+                'id' => 'unit_price_tax_incl',
+                'header' => $this->l('Ед.цена'),
+                'dataIndex' => 'unit_price_tax_incl',
+                'align' => 'right'
             ),
             array(
-                'id' => 'invertido',
-                'header' => $this->l('Вложено'),
-                'dataIndex' => 'invertido',
-                'align' => 'center'
+                'id' => 'unit_price_tax_incl_after_disc',
+                'header' => $this->l('Ед.цена*'),
+                'dataIndex' => 'unit_price_tax_incl_after_disc',
+                'align' => 'right'
             ),
             array(
-                'id' => 'totalPriceSold',
-                'header' => $this->l('Приходи'),
-                'dataIndex' => 'totalPriceSold',
-                'align' => 'center'
+                'id' => 'purchase_supplier_price',
+                'header' => $this->l('Дост.цена'),
+                'dataIndex' => 'purchase_supplier_price',
+                'align' => 'right'
             ),
+            /*
             array(
-                'id' => 'pechalba',
+                'id' => 'UNIT_PROFIT',
+                'header' => $this->l('Ед.печалба'),
+                'dataIndex' => 'UNIT_PROFIT',
+                'align' => 'right'
+            ),
+            */
+            array(
+                'id' => 'TOTAL_PROFIT',
                 'header' => $this->l('Печалба'),
-                'dataIndex' => 'pechalba',
-                'align' => 'center'
+                'dataIndex' => 'TOTAL_PROFIT',
+                'align' => 'right'
             )
-        );
+    
+        );    
 
         $this->displayName = $this->l('Molinezia');
         $this->description = $this->l('Справка печалба по продукти');
@@ -132,13 +167,10 @@ class spravka extends ModuleGrid
         <div class="alert alert-info">
             <h4>'.$this->l('Разяснение към модула').'</h4>
             <div>
-                '.$this->l('Всички цени в справката са в ').'<strong>'.$this->l(' български лева').'</strong> <br />
-                '.$this->l('Стойностите са ').'<strong>'.$this->l(' без данък').'</strong><br />
-                '.$this->l('').'
+                '.$this->l('Всички цени в справката са в ').'<strong>'.$this->l(' български лева с ДДС').'</strong> <br />
+
                 <ul>
-                    <li>'.$this->l('Колона \'Вложено\' е сумата от покупната цена на продукта без данък, умножена по продаденото количество').'</li>
-                    <li>'.$this->l('В колона \'Приходи\' стойността е резултат от сумата от продажните цени без данък, но с вкл. отстъпки и умножена по продаденото количество').'</li>
-                    <li>'.$this->l('\'Печалба\' ни дава разликата от стойностите от колоните \'Вложено\' и \'Приходи\'').'</li>
+                    <li>'.$this->l('С достатъчно бира всичко се постига').'</li>
                 </ul>
             </div>
         </div>
@@ -152,25 +184,78 @@ class spravka extends ModuleGrid
         $date_between = $this->getDate();
         $array_date_between = explode(' AND ', $date_between);
 
-        $this->query = 'SELECT SQL_CALC_FOUND_ROWS p.reference, p.id_product, pl.name,
-				ROUND(p.wholesale_price, 2) as basicPrice,
-                ROUND(p.price, 2) as priceSold,
-                IFNULL(SUM(od.product_quantity), 0) AS totalQuantitySold,
-				ROUND(SUM(p.wholesale_price * od.product_quantity), 2) as invertido,
-				ROUND(IFNULL(SUM(o.total_paid_tax_excl) * od.product_quantity, 0), 2) AS totalPriceSold,
-                ROUND((SUM(o.total_paid_tax_excl)-SUM(p.wholesale_price)), 2) as pechalba,
-				product_shop.active
-				FROM '._DB_PREFIX_.'product p
-				'.Shop::addSqlAssociation('product', 'p').'
-				LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().' '.Shop::addSqlRestrictionOnLang('pl').')
-				LEFT JOIN '._DB_PREFIX_.'order_detail od ON od.product_id = p.id_product
-				LEFT JOIN '._DB_PREFIX_.'orders o ON od.id_order = o.id_order
-				'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-				'.Product::sqlStock('p', 0).'
-				WHERE o.valid = 1
-				AND o.invoice_date BETWEEN '.$date_between.'
-				GROUP BY od.product_id';
 
+$this->query = 
+'SELECT SQL_CALC_FOUND_ROWS
+    o.id_order,
+    o.reference,
+    o.payment,
+    o.date_add,
+    o.date_upd,
+    o.total_products_wt,
+    o.total_shipping,
+    o.total_discounts,
+    o.total_paid,
+--    o.total_paid_tax_excl,
+--    o.total_paid_tax_incl,
+    
+    o.id_currency,
+    o.valid,
+    
+    os.deleted,
+    os.hidden,
+    os.paid,
+    os.shipped,
+    os.color,
+
+	o.invoice_date,
+    coalesce(cr.reduction_percent,0) as reduction_percent,
+	ocr.name as reduction_name,
+	
+--    ocr.value,
+--    ocr.value_tax_excl,
+
+    od.product_id,
+--    od.product_attribute_id,
+    od.product_name,
+    od.product_reference,
+--    od.product_price,
+    od.product_quantity,
+    
+    ROUND (od.unit_price_tax_incl,2) AS unit_price_tax_incl ,
+    ROUND (od.unit_price_tax_incl * (100 - COALESCE(cr.reduction_percent,0) ) / 100,2) as unit_price_tax_incl_after_disc,
+--    od.unit_price_tax_excl,
+   
+--    od.total_price_tax_incl,
+--    od.total_price_tax_excl,
+
+--    od.original_product_price,    
+--    od.original_wholesale_price,
+
+    ROUND (coalesce(od.purchase_supplier_price,0),2) as purchase_supplier_price,
+    ROUND (
+        ROUND (od.unit_price_tax_incl * (100 - coalesce(cr.reduction_percent,0)  ) / 100,2) 
+        - 
+        coalesce(od.purchase_supplier_price,0)
+    ,2) as UNIT_PROFIT,
+    
+    ROUND (
+        od.product_quantity * 
+        (ROUND (od.unit_price_tax_incl * (100 - coalesce(cr.reduction_percent,0) ) / 100,2) 
+        - 
+        coalesce(od.purchase_supplier_price,0)
+        ) 
+    ,2) as TOTAL_PROFIT
+    
+FROM '._DB_PREFIX_.'orders o
+JOIN '._DB_PREFIX_.'order_detail od ON od.id_order = o.id_order
+LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = o.`current_state`)
+LEFT JOIN `'._DB_PREFIX_.'order_cart_rule` ocr ON (ocr.id_order = o.id_order)
+LEFT JOIN `'._DB_PREFIX_.'cart_rule` cr ON (ocr.id_cart_rule = cr.id_cart_rule)  
+WHERE o.invoice_date BETWEEN '.$date_between.' AND o.valid = 1 
+ORDER BY o.invoice_date'; 
+
+/*
         if (Validate::IsName($this->_sort)) {
             $this->query .= ' ORDER BY `'.bqSQL($this->_sort).'`';
             if (isset($this->_direction) && Validate::isSortDirection($this->_direction)) {
@@ -181,7 +266,7 @@ class spravka extends ModuleGrid
         if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit)) {
             $this->query .= ' LIMIT '.(int)$this->_start.', '.(int)$this->_limit;
         }
-
+*/
         $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
 
         foreach ($values as &$value) {
@@ -195,11 +280,9 @@ class spravka extends ModuleGrid
             $value['totalPriceSold'] = Context::getContext()->currentLocale->formatNumber($value['totalPriceSold']);
             $value['pechalba'] = Context::getContext()->currentLocale->formatNumber($value['pechalba']); */
 
-            $value['basicPrice'] = Tools::displayNumber($value['basicPrice']);
-            $value['priceSold'] = Tools::displayNumber($value['priceSold']);
-            $value['invertido'] = Tools::displayNumber($value['invertido']);
-            $value['totalPriceSold'] = Tools::displayNumber($value['totalPriceSold']);
-            $value['pechalba'] = Tools::displayNumber($value['pechalba']);
+            $value['product_quantity'] = Tools::displayNumber($value['product_quantity']);
+            $value['reduction_percent'] = Tools::displayNumber($value['reduction_percent']);
+            
         }
         unset($value);
 
